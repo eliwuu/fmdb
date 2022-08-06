@@ -1,7 +1,7 @@
 import path from 'path';
 
-import { DataService } from '../src/services/data.service';
-import { Logger } from '../src/services/logger.service';
+import { DataService } from '../../src/services/data.service';
+import { Logger } from '../../src/services/logger.service';
 
 const filePath = path.join(__dirname.replace('test', 'src'), 'data', 'db.json');
 
