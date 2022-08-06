@@ -8,4 +8,5 @@ export interface Movie {
   actors: string;
   plot: string;
   posterUrl: string;
+  deleted?: boolean;
 }
