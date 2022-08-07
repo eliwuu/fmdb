@@ -1,14 +1,86 @@
 import { Movie } from '../model/movie';
 
-export type Filter = { [P in keyof Movie]?: QuerySelector };
+export type Query = { [P in keyof Movie]?: QuerySelector };
 
-type QuerySelector = {
+export type QuerySelector = {
+  /**
+   * equal
+   */
   $eq?: string;
+  /**
+   * like - search string
+   */
   $like?: string;
+  $collection?: string[];
+  /**
+   * greater than
+   */
   $gt?: number;
+  /**
+   * less than
+   */
   $lt?: number;
+  /**
+   * greater or equal than
+   */
+  $get?: number;
+  /**
+   * less or equal than
+   */
+  $let?: number;
 };
 
-const usefilter = (aFitler: Filter, dataSource: Movie[]) => {
-  const selector = dataSource.map((x) => Object.keys(x).filter((y) => aFitler));
+export interface SearchObject {
+  field: string;
+  query: SearchQuery[];
+}
+
+export interface SearchQuery {
+  operator: string;
+  value: string | string[] | number;
+}
+
+export const processQuery = (query: Query): SearchObject[] => {
+  return Object.entries(query).map((x) => {
+    return {
+      field: x[0],
+      query: Object.entries(x[1]).map((y) => {
+        return {
+          operator: y[0],
+          value: y[1],
+        };
+      }),
+    };
+  });
+};
+
+const filterData = <T>(movies: T[], filters: SearchObject[]) => {
+  let filteredData: T[];
+
+  filters.forEach((filter) => {
+    if (filteredData === undefined) {
+      filteredData = movies;
+    }
+    filter.query.forEach((query) => {
+      const intermediate = filteredData.filter((x: any) => {
+        switch (query.operator as keyof QuerySelector) {
+          case '$gt':
+            return x[filter.field] > query.value;
+          case '$lt':
+            return x[filter.field] < query.value;
+          case '$get':
+            return x[filter.field] >= query.value;
+          case '$let':
+            return x[filter.field] <= query.value;
+          case '$eq':
+            return x[filter.field] === query.value;
+          case '$collection':
+            return x[filter.field] === (query.value as string[])[0];
+        }
+      });
+      filteredData = intermediate;
+    });
+  });
+
+  return filterData;
 };
