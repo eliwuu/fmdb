@@ -54,7 +54,8 @@ export const processQuery = (query: Query): SearchObject[] => {
   });
 };
 
-const filterData = <T>(movies: T[], filters: SearchObject[]) => {
+export const filterData = <T>(movies: T[], query: Query) => {
+  const filters = processQuery(query);
   let filteredData: T[];
 
   filters.forEach((filter) => {
@@ -82,5 +83,5 @@ const filterData = <T>(movies: T[], filters: SearchObject[]) => {
     });
   });
 
-  return filterData;
+  return filteredData!;
 };
