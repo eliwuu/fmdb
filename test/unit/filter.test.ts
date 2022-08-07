@@ -1,5 +1,6 @@
+// import { QuerySelector } from '../../src/';
 import { Movie } from '../../src/model/movie';
-import { Filter } from '../../src/services/filter.service';
+import { Query, filterData } from '../../src/services/filter.service';
 
 const movies: Movie[] = [
   {
@@ -28,39 +29,34 @@ const movies: Movie[] = [
   },
 ];
 
-test('Get movie by title search', async () => {
-  const filter: Filter = {
+test('Get movie by title', async () => {
+  const query: Query = {
     title: { $eq: 'Abcde' },
-    runtime: { $gt: 10, $lt: 300 },
   };
 
-  //   const filterField = Object.keys(filter);
-  const setFilter = Object.entries(filter).map((x) => {
-    return {
-      field: x[0],
-      operators: Object.entries(x[1]).map((y) => {
-        return JSON.stringify({
-          operator: y[0],
-          value: y[1],
-        });
-      }),
-      //   value: x[1][1],
-    };
-  });
+  const result = filterData<Movie>(movies, query);
 
-  //   const field = setFilter[0];
-  //   const operator = setOperator[0];
-  //   const value = setOperator[1];
+  expect(result.length).toBe(1);
+  expect(result[0].title).toBe(query.title?.$eq);
+});
+test('Get movie by title and runtime (fail)', async () => {
+  const query: Query = {
+    title: { $eq: 'Oemgie' },
+    runtime: { $gt: 10 },
+  };
 
-  console.log(JSON.stringify(setFilter));
-  console.table(setFilter);
+  const result = filterData<Movie>(movies, query);
 
-  movies.map((x) => x);
+  expect(result.length).toBe(0);
+});
+test('Get movie by title and runtime (ok)', async () => {
+  const query: Query = {
+    title: { $eq: 'Oemgie' },
+    runtime: { $get: 10 },
+  };
 
-  //   const filteredMovie = movies.filter((x: any) => {
-  //     x[field] === value;
-  //   });
+  const result = filterData<Movie>(movies, query);
 
-  //   console.log(filteredMovie);
-  //   expect(filteredMovie.).toBe('Abcde');
+  expect(result.length).toBe(1);
+  expect(result[0].title).toBe(query.title?.$eq);
 });
