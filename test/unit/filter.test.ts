@@ -60,3 +60,15 @@ test('Get movie by title and runtime (ok)', async () => {
   expect(result.length).toBe(1);
   expect(result[0].title).toBe(query.title?.$eq);
 });
+
+test('Get movies by genres', async () => {
+  const query: Query = {
+    genres: { $collection: ['Not', 'A', 'Comedy'] },
+  };
+
+  // let tempMovies: Movie[];
+  const getByGenres = query.genres?.$collection?.filter((x) => {
+    return movies.filter((y) => y.genres.map((z) => z === x));
+  });
+  console.log(getByGenres);
+});
