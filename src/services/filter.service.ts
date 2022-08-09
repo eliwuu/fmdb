@@ -1,6 +1,6 @@
 import { Movie } from '../model/movie';
 
-export type Query = { [P in keyof Movie]?: QuerySelector };
+export type Query<T = Movie> = { [P in keyof T]?: QuerySelector };
 
 export type QuerySelector = {
   /**
@@ -70,9 +70,9 @@ export const filterData = <T>(movies: T[], query: Query) => {
           case '$lt':
             return x[filter.field] < query.value;
           case '$get':
-            return x[filter.field] >= query.value;
+            return +x[filter.field] >= query.value;
           case '$let':
-            return x[filter.field] <= query.value;
+            return +x[filter.field] <= query.value;
           case '$eq':
             return x[filter.field] === query.value;
           case '$collection':
