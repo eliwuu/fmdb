@@ -1,6 +1,8 @@
+import Joi from 'joi';
 import { Logger } from 'winston';
 import { DataSource } from '../model/dataSource';
 import { Movie } from '../model/movie';
+import { filterData } from './filter.service';
 
 export default class MovieService {
   /**
@@ -33,7 +35,7 @@ export default class MovieService {
     (dataSource: DataSource, logger: Logger) =>
     (options: { id?: number; movie?: Movie }) => {
       try {
-        const movieIndex = this.getMovieIndex(
+        const movieIndex = this.getIndex(
           options.id ?? options.movie!.id,
           dataSource,
           logger
@@ -56,7 +58,7 @@ export default class MovieService {
   public static update =
     (dataSource: DataSource, logger: Logger) => (data: Movie) => {
       try {
-        const movieIndex = this.getMovieIndex(data.id, dataSource, logger);
+        const movieIndex = this.getIndex(data.id, dataSource, logger);
 
         dataSource.movies[movieIndex as number] = data;
 
@@ -66,7 +68,7 @@ export default class MovieService {
       }
     };
 
-  public static getMovieIndex = (
+  public static getIndex = (
     id: number,
     dataSource: DataSource,
     logger: Logger
@@ -85,4 +87,32 @@ export default class MovieService {
 
     return movieIndex;
   };
+  public static get =
+    (dataSource: DataSource) =>
+    (options?: { runtime?: number; genres?: string[] }) => {
+      let movies = dataSource.movies.filter((x) => !x.deleted);
+      if (options?.runtime && options.runtime !== NaN) {
+        movies = filterData<Movie>(movies, {
+          runtime: { $get: +options.runtime - 10, $let: +options.runtime + 10 },
+        });
+      }
+      // if (options?.genres) {
+      //   movies.filter((x) => options.genres.includes(x.genres));
+      // }
+      return movies;
+    };
+  public static validate(movie: Omit<Movie, 'id'>) {
+    const schema = Joi.object<Omit<Movie, 'id'>>({
+      title: Joi.string().max(255).required(),
+      year: Joi.number().integer().min(1888).required(),
+      runtime: Joi.number().integer().min(1).required(),
+      genres: Joi.array().items(Joi.string()).required(),
+      director: Joi.string().max(255).required(),
+      actors: Joi.string(),
+      plot: Joi.string(),
+      posterUrl: Joi.string(),
+    });
+
+    return schema.validate(movie);
+  }
 }
