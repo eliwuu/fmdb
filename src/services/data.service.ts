@@ -2,10 +2,9 @@ import fs from 'fs/promises';
 
 import { DataSource } from '../model/dataSource';
 import { Logger } from 'winston';
-import { Movie } from '../model/movie';
 
 export class DataService {
-  private dataSource: DataSource | undefined;
+  private dataSource: DataSource | undefined | null;
   private isInitialized = false;
 
   /**
@@ -39,6 +38,7 @@ export class DataService {
       return { status: 'error', msg: error.message };
     }
 
+    this.dataSource = dataSource;
     return { status: 'ok' };
   }
 
@@ -47,7 +47,7 @@ export class DataService {
    * use after any changes to database file
    */
   public invalidateCache() {
-    this.dataSource = undefined;
+    this.dataSource = null;
   }
 
   /**
@@ -55,7 +55,7 @@ export class DataService {
    * use after any changes to database file
    */
   public async refreshCache(): Promise<void> {
-    if (this.dataSource === undefined) {
+    if (this.dataSource === undefined || this.dataSource === null) {
       this.dataSource = await this.loadDataSource();
     }
   }
