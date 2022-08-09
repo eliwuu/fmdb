@@ -1,0 +1,9 @@
+version: '3.9'
+services:
+  fmdb:
+    build: .
+    restart: always
+    ports:
+      - '${PORT}:${PORT}'
+    env_file:
+      - .env
