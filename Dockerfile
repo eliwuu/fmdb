@@ -15,7 +15,7 @@ RUN npm run test
 FROM unit-test as build-prod
 ENV ENV production
 RUN rm -rf test/
-RUN npx tsc
+RUN npm run build
 RUN npm ci --omit-dev
 COPY src/data/db.json dist/data/db.json
 CMD ["npm", "start"]
