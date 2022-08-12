@@ -11,7 +11,6 @@ const filePath = path.join(
 );
 
 test('Succesfully initialize data source', async () => {
-  console.log(filePath);
   const dataSource = new DataService(filePath, Logger);
 
   const result = await dataSource.init();
