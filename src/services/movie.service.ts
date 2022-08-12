@@ -135,17 +135,13 @@ export default class MovieService {
    * @param genres Pass genres to check if they exist in dataSource
    * @returns true if all genres exist in dataSource, false otherwise
    */
-  public static checkGenres =
+  public static genresExist =
     (dataSource: DataSource) => (genres: string[]) => {
       const genresSet = new Set(genres);
       const intersect = new Set(
         dataSource.genres.filter((x) => genresSet.has(x))
       );
-      if (intersect.size !== genresSet.size) {
-        return false;
-      }
-
-      return true;
+      return intersect.size === genresSet.size;
     };
 
   /**

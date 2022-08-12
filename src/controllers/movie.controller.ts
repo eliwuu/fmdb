@@ -45,10 +45,10 @@ movieController.post('/add', async (req, res) => {
     return res.status(500).send('Internal server error');
   }
 
-  const checkGenres = MovieService.checkGenres(data!)(movie.genres);
+  const genresExist = MovieService.genresExist(data!)(movie.genres);
   const isDuplicate = MovieService.isDuplicate(data!)(movie.title);
 
-  if (!checkGenres) {
+  if (!genresExist) {
     return res.status(400).json('You can only use genres from the list');
   }
 
