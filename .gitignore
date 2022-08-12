@@ -5,3 +5,7 @@ dist
 .*audit.json
 *.log
 requirements.md
+
+# System Files
+.DS_Store
+Thumbs.db
