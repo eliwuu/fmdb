@@ -87,20 +87,33 @@ export default class MovieService {
 
     return movieIndex;
   };
+
+  /**
+   *
+   * @param dataSource Pass data source from DataService.getData()
+   * @param options Pass runtime and/or genres to filter data
+   * @returns movies or movies filtered by runtime and/or genres
+   */
   public static get =
     (dataSource: DataSource) =>
     (options?: { runtime?: number; genres?: string[] }) => {
       let movies = dataSource.movies.filter((x) => !x.deleted);
-      if (options?.runtime && options.runtime !== NaN) {
+      if (options?.runtime && !isNaN(options.runtime)) {
         movies = filterData<Movie>(movies, {
           runtime: { $get: +options.runtime - 10, $let: +options.runtime + 10 },
         });
       }
-      // if (options?.genres) {
-      //   movies.filter((x) => options.genres.includes(x.genres));
-      // }
+      if (options?.genres) {
+        if (typeof options.genres === 'string')
+          options.genres = [options.genres];
+
+        movies = filterData<Movie>(movies, {
+          genres: { $collection: options.genres },
+        });
+      }
       return movies;
     };
+
   public static validate(movie: Omit<Movie, 'id'>) {
     const schema = Joi.object<Omit<Movie, 'id'>>({
       title: Joi.string().max(255).required(),
@@ -108,11 +121,44 @@ export default class MovieService {
       runtime: Joi.number().integer().min(1).required(),
       genres: Joi.array().items(Joi.string()).required(),
       director: Joi.string().max(255).required(),
-      actors: Joi.string(),
-      plot: Joi.string(),
-      posterUrl: Joi.string(),
+      actors: Joi.string().optional(),
+      plot: Joi.string().optional(),
+      posterUrl: Joi.string().optional(),
     });
 
     return schema.validate(movie);
   }
+
+  /**
+   *
+   * @param dataSource Pass data source from DataService.getData()
+   * @param genres Pass genres to check if they exist in dataSource
+   * @returns true if all genres exist in dataSource, false otherwise
+   */
+  public static checkGenres =
+    (dataSource: DataSource) => (genres: string[]) => {
+      const genresSet = new Set(genres);
+      const intersect = new Set(
+        dataSource.genres.filter((x) => genresSet.has(x))
+      );
+      if (intersect.size !== genresSet.size) {
+        return false;
+      }
+
+      return true;
+    };
+
+  /**
+   *
+   * @param dataSource Pass data source from DataService.getData()
+   * @param title Pass movie title to check if it exists in dataSource
+   * @returns true if duplicate movie is found, false otherwise
+   */
+  public static isDuplicate = (dataSource: DataSource) => (title: string) => {
+    return (
+      filterData<Movie>(dataSource.movies, {
+        title: { $eq: title },
+      }).length > 0
+    );
+  };
 }
