@@ -26,11 +26,11 @@ test('Create movie with correct genre', async () => {
     plot: 'Generic plot',
   };
   const validate = MovieService.validate(movie);
-  const checkGenres = MovieService.checkGenres(data!)(movie.genres);
+  const genresExist = MovieService.genresExist(data!)(movie.genres);
   const isDuplicate = MovieService.isDuplicate(data!)(movie.title);
 
   expect(validate.error).toBe(undefined);
-  expect(checkGenres).toBe(true);
+  expect(genresExist).toBe(true);
   expect(isDuplicate).toBe(false);
 });
 
@@ -48,11 +48,11 @@ test('Create movie with incorrect genre - fail', async () => {
     plot: 'Generic plot',
   };
   const validate = MovieService.validate(movie);
-  const checkGenres = MovieService.checkGenres(data!)(movie.genres);
+  const genresExist = MovieService.genresExist(data!)(movie.genres);
   const isDuplicate = MovieService.isDuplicate(data!)(movie.title);
 
   expect(validate.error).toBe(undefined);
-  expect(checkGenres).toBe(false);
+  expect(genresExist).toBe(false);
   expect(isDuplicate).toBe(false);
 });
 
@@ -70,11 +70,11 @@ test('Create duplicate movie - fail', async () => {
     plot: 'Generic plot',
   };
   const validate = MovieService.validate(movie);
-  const checkGenres = MovieService.checkGenres(data!)(movie.genres);
+  const genresExist = MovieService.genresExist(data!)(movie.genres);
   const isDuplicate = MovieService.isDuplicate(data!)(movie.title);
 
   expect(validate.error).toBe(undefined);
-  expect(checkGenres).toBe(false);
+  expect(genresExist).toBe(false);
   expect(isDuplicate).toBe(true);
 });
 
@@ -92,13 +92,13 @@ test('Create invalid movie - fail', async () => {
     plot: 'Generic plot',
   };
   const validate = MovieService.validate(movie);
-  const checkGenres = MovieService.checkGenres(data!)(movie.genres);
+  const genresExist = MovieService.genresExist(data!)(movie.genres);
   const isDuplicate = MovieService.isDuplicate(data!)(movie.title);
 
   expect(validate.error?.message).toBe(
     `"title" length must be less than or equal to 255 characters long`
   );
-  expect(checkGenres).toBe(false);
+  expect(genresExist).toBe(false);
   expect(isDuplicate).toBe(false);
 });
 
@@ -117,11 +117,11 @@ test('Add movie with correct genre', async () => {
   };
 
   const validate = MovieService.validate(movie);
-  const checkGenres = MovieService.checkGenres(data!)(movie.genres);
+  const genresExist = MovieService.genresExist(data!)(movie.genres);
   const isDuplicate = MovieService.isDuplicate(data!)(movie.title);
 
   expect(validate.error).toBe(undefined);
-  expect(checkGenres).toBe(true);
+  expect(genresExist).toBe(true);
   expect(isDuplicate).toBe(false);
 
   const result = MovieService.add(data!)(movie);
