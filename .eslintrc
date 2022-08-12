@@ -8,6 +8,7 @@
     "plugin:@typescript-eslint/recommended"
   ],
   "rules": {
-    "no-console": 1
+    "no-console": 1,
+    "@typescript-eslint/no-non-null-assertion": 0
   }
 }
