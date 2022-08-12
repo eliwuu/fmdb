@@ -28,8 +28,5 @@ jobs:
         run: npm run lint
       - name: Test
         run: npm run test
-        env:
-          DS_FILE: db.json
-          PORT: 3000
       - name: Build
         run: npm run build

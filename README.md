@@ -11,5 +11,3 @@ To start type
 ```bash
 sh compose.sh
 ```
-
-// trigger github actions workflow
