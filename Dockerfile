@@ -16,6 +16,6 @@ FROM unit-test as build-prod
 ENV ENV production
 RUN rm -rf test/
 RUN npx tsc
-RUN npm ci --production
+RUN npm ci --omit-dev
 COPY src/data/db.json dist/data/db.json
 CMD ["npm", "start"]
