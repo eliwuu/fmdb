@@ -74,12 +74,23 @@ export class DataService {
         encoding: 'utf-8',
       });
       const dataSource = JSON.parse(loadFile) as DataSource;
+      dataSource.movies.map((x) => {
+        Object.values(x).map((y) => {
+          typeof y === 'string' ? y.normalize : y;
+        });
+      });
       return dataSource;
     } catch (err: unknown) {
       this.logger.error(err);
       return undefined;
     }
   }
+
+  /**
+   *
+   * @param dataSource Pass data source from DataService.getData()
+   * @returns Stauts of data update
+   */
   public async updateDataSource(
     dataSource: DataSource
   ): Promise<{ status: 'ok' | 'error'; msg?: string }> {
