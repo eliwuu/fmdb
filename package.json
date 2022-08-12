@@ -6,6 +6,7 @@
   "scripts": {
     "test": "npx jest test",
     "lint": "eslint --ext .js,.ts src test",
+    "build": "npx tsc",
     "start": "node dist/app.js"
   },
   "keywords": [
