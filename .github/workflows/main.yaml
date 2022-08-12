@@ -21,10 +21,10 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
+        env:
+          DS_FILE: db.json
+          PORT: 3000
       - run: npm install
       - run: npm run lint
       - run: npm run test
       - run: npm run build
-      - env:
-          - DS_FILE: db.json
-          - PORT: 3000
