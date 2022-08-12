@@ -14,6 +14,9 @@ type QuerySelector = {
    * like - search string
    */
   $like?: string;
+  /**
+   * collection - array of string values to filter
+   */
   $collection?: string[];
   /**
    * greater than
@@ -92,6 +95,10 @@ export const filterData = <T>(data: T[], query: Query<T>) => {
               return +x[filter.field] <= query.value;
             case '$eq':
               return x[filter.field] === query.value;
+            case '$like':
+              if (typeof x[filter.field] === 'string') {
+                return x[filter.field].includes(query.value);
+              }
           }
         });
         filteredData = intermediate;
