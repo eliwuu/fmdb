@@ -1,8 +1,11 @@
 import { Movie } from '../model/movie';
 
-export type Query<T = Movie> = { [P in keyof T]?: QuerySelector };
+type Query<T = Movie> = { [P in keyof T]?: QuerySelector };
 
-export type QuerySelector = {
+/**
+ * Filter data by query
+ */
+type QuerySelector = {
   /**
    * equal
    */
@@ -30,17 +33,17 @@ export type QuerySelector = {
   $let?: number;
 };
 
-export interface SearchObject {
+interface SearchObject {
   field: string;
   query: SearchQuery[];
 }
 
-export interface SearchQuery {
+interface SearchQuery {
   operator: string;
   value: string | string[] | number;
 }
 
-export const processQuery = (query: Query): SearchObject[] => {
+const processQuery = (query: Query): SearchObject[] => {
   return Object.entries(query).map((x) => {
     return {
       field: x[0],
@@ -54,34 +57,78 @@ export const processQuery = (query: Query): SearchObject[] => {
   });
 };
 
-export const filterData = <T>(movies: T[], query: Query) => {
+/**
+ *
+ * @param data - array of objects to filter
+ * @param query - object with fields and values to filter
+ * @returns
+ */
+export const filterData = <T>(data: T[], query: Query<T>) => {
   const filters = processQuery(query);
   let filteredData: T[];
 
   filters.forEach((filter) => {
     if (filteredData === undefined) {
-      filteredData = movies;
+      filteredData = data;
     }
     filter.query.forEach((query) => {
-      const intermediate = filteredData.filter((x: any) => {
-        switch (query.operator as keyof QuerySelector) {
-          case '$gt':
-            return x[filter.field] > query.value;
-          case '$lt':
-            return x[filter.field] < query.value;
-          case '$get':
-            return +x[filter.field] >= query.value;
-          case '$let':
-            return +x[filter.field] <= query.value;
-          case '$eq':
-            return x[filter.field] === query.value;
-          case '$collection':
-            return x[filter.field] === (query.value as string[])[0];
-        }
-      });
-      filteredData = intermediate;
+      if ((query.operator as keyof QuerySelector) === '$collection') {
+        filteredData = filterCollection<T>(
+          filteredData,
+          query.value as string[],
+          filter.field
+        );
+      } else {
+        const intermediate = filteredData.filter((x: any) => {
+          switch (query.operator as keyof QuerySelector) {
+            case '$gt':
+              return x[filter.field] > query.value;
+            case '$lt':
+              return x[filter.field] < query.value;
+            case '$get':
+              return +x[filter.field] >= query.value;
+            case '$let':
+              return +x[filter.field] <= query.value;
+            case '$eq':
+              return x[filter.field] === query.value;
+          }
+        });
+        filteredData = intermediate;
+      }
     });
   });
 
   return filteredData!;
+};
+
+/**
+ *
+ * @param data - array of objects to filter
+ * @param collection - array of values to filter
+ * @param field - field to filter by
+ * @returns
+ */
+const filterCollection = <T>(
+  data: T[],
+  collection: string[],
+  field: string
+) => {
+  const selectedGenres = collection.map((x) => x.toLowerCase());
+  const filteredMovies = data.map((x: any) => {
+    const mapped = x[field].filter((y: any) => {
+      const status = selectedGenres.map((z) => {
+        return z === y.toLowerCase();
+      });
+
+      return status.includes(true);
+    });
+
+    if (mapped.length > 0) return { ...x, field: mapped };
+  });
+
+  return filteredMovies
+    .sort((a, b) => {
+      return b!.field.length - a!.field.length;
+    })
+    .filter((x) => x !== undefined);
 };
