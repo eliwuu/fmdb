@@ -1,5 +1,8 @@
 # FMDB
 
+Build status:
+[![Node.js CI](https://github.com/eliwuu/fmdb/actions/workflows/node.js.yml/badge.svg)](https://github.com/eliwuu/fmdb/actions/workflows/node.js.yml)
+
 ## Requirements
 
 1. Docker
