@@ -79,6 +79,7 @@ export const filterData = <T>(data: T[], query: Query<T>) => {
           filter.field
         );
       } else {
+        /* eslint-disable  @typescript-eslint/no-explicit-any */
         const intermediate = filteredData.filter((x: any) => {
           switch (query.operator as keyof QuerySelector) {
             case '$gt':
@@ -114,7 +115,9 @@ const filterCollection = <T>(
   field: string
 ) => {
   const selectedGenres = collection.map((x) => x.toLowerCase());
+  /* eslint-disable  @typescript-eslint/no-explicit-any */
   const filteredMovies = data.map((x: any) => {
+    /* eslint-disable  @typescript-eslint/no-explicit-any */
     const mapped = x[field].filter((y: any) => {
       const status = selectedGenres.map((z) => {
         return z === y.toLowerCase();
