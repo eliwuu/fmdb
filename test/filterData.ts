@@ -1,4 +1,4 @@
-import { Movie } from '../src/model/movie';
+import { Movie } from '../src/domain/movie/movie.domain';
 
 export const movies: Movie[] = [
   {
@@ -85,4 +85,7 @@ export const movies: Movie[] = [
     posterUrl:
       'https://images.unsplash.com/photo-1555685812-4b943f1cb0eb?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
   },
-];
+].map((x) => {
+  const genreSet = new Set(x.genres);
+  return { ...x, genres: genreSet };
+});
